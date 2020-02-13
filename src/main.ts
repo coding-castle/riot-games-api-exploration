@@ -75,15 +75,18 @@ async function getLatestPatch(): string {
     return result.data[0]
 }
 
-async function getChampions()  {
+async function getChampions() {
     const currentPatch = await getLatestPatch()
     let champions = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
     champions = JSON.parse(champions)
     const obs = Object.keys(champions).map(key => champions[key])
-    const cachedPatch:string = obs[0].version
-    if (currentPatch)
-    // const result = await axios.get(`http://ddragon.leagueoflegends.com/cdn/${currentPatch}/data/en_US/champion.json`)
-    // fs.writeFileSync("data/champions.json", JSON.stringify(result.data.data))
+    const cachedPatch: string = obs[0].version
+    if (currentPatch !== cachedPatch) {
+        const result = await axios.get(
+            `http://ddragon.leagueoflegends.com/cdn/${currentPatch}/data/en_US/champion.json`,
+        )
+        fs.writeFileSync("data/champions.json", JSON.stringify(result.data.data))
+    }
 }
 
 async function getChampionName(id: number): Promise<string> {
