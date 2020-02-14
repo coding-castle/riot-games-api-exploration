@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Match, MatchHistory, LaneCount, ChampionCount, Summoner } from "./types"
+import { Match, MatchHistory, LaneCount, ChampionCount, Summoner, Champion } from "./types"
 // import fs from "fs"
 import * as fs from "fs"
 // const fs = require("fs")
@@ -70,15 +70,15 @@ function getMsThirtyDaysAgo(): number {
     return Date.now() - 1000 * 60 * 60 * 24 * 30
 }
 
-async function getLatestPatch(): string {
+async function getLatestPatch(): Promise<string> {
     const result = await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")
     return result.data[0]
 }
 
-async function getChampions() {
+async function getChampions(): Promise<void> {
     const currentPatch = await getLatestPatch()
-    let champions = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
-    champions = JSON.parse(champions)
+    const championsJSON = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
+    const champions: object[] = JSON.parse(championsJSON) as Champion[]
     const obs = Object.keys(champions).map(key => champions[key])
     const cachedPatch: string = obs[0].version
     if (currentPatch !== cachedPatch) {
@@ -90,8 +90,12 @@ async function getChampions() {
 }
 
 async function getChampionName(id: number): Promise<string> {
-    const obs = Object.keys(result.data.data).map(key => result.data.data[key])
+    await getChampions()
+    let champions = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
+    champions = JSON.parse(champions)
+    const obs = Object.keys(champions).map(key => champions[key])
     const champ = obs.find(item => item.key == id)
+    console.log(champ.id)
     return champ.id
 }
 
@@ -184,7 +188,7 @@ async function main(): Promise<void> {
 
     // console.log("most played champions are:")
     // console.log(champions)
-    // await getChampionName(2)
+    //await getChampionName(2)
     await getChampions()
     //await bigData()
 }
