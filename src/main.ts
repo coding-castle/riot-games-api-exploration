@@ -78,8 +78,8 @@ async function getLatestPatch(): Promise<string> {
 async function getChampions(): Promise<void> {
     const currentPatch = await getLatestPatch()
     const championsJSON = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
-    const champions: object[] = JSON.parse(championsJSON) as Champion[]
-    const obs = Object.keys(champions).map(key => champions[key])
+    const champions = JSON.parse(championsJSON)
+    const obs = Object.keys(champions).map(key => champions[key] as Champion)
     const cachedPatch: string = obs[0].version
     if (currentPatch !== cachedPatch) {
         const result = await axios.get(
@@ -91,12 +91,12 @@ async function getChampions(): Promise<void> {
 
 async function getChampionName(id: number): Promise<string> {
     await getChampions()
-    let champions = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
-    champions = JSON.parse(champions)
-    const obs = Object.keys(champions).map(key => champions[key])
+    const championsJSON = fs.readFileSync("data/champions.json", { encoding: "utf-8" })
+    const champions = JSON.parse(championsJSON)
+    const obs = Object.keys(champions).map(key => champions[key] as Champion)
     const champ = obs.find(item => item.key == id)
-    console.log(champ.id)
-    return champ.id
+    console.log(champ?.id)
+    return champ?.id || ""
 }
 
 function getLanesDesc(matches: Match[]): LaneCount[] {
