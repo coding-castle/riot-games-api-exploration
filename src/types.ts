@@ -42,3 +42,17 @@ export interface Summoner {
     summonerId: string
     leaguePoints: number
 }
+
+export interface Champion {
+    version: string
+    id: string
+    key: number
+    name: string
+    title: string
+    blurb: string
+    info: object
+    image: object
+    tags: Array<string>
+    partype: string
+    stats: object
+}
